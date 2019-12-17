@@ -76,13 +76,13 @@ rule genotype:
 # combine reads for BB indivs
 rule combine_reads:
     input:
-        r1_1 = 'data/reads/{sample}_{run}/{sample}_{run}_R1.fq.gz',
-        r1_2 = 'data/reads/{sample}_{run}/{sample}_{run}_R2.fq.gz',
-        r2_1 = 'data/reads2/{sample}_{run}/{sample}_{run}_R1.fq.gz',
-        r2_2 = 'data/reads2/{sample}_{run}/{sample}_{run}_R2.fq.gz'
+        r1_1 = 'data/bb_lane1/{sample}_{run}/{sample}_{run}_R1.fq.gz',
+        r1_2 = 'data/bb_lane1/{sample}_{run}/{sample}_{run}_R2.fq.gz',
+        r2_1 = 'data/bb_lane2/{sample}_{run}/{sample}_{run}_R1.fq.gz',
+        r2_2 = 'data/bb_lane2/{sample}_{run}/{sample}_{run}_R2.fq.gz'
     output:
-        r1 = 'output/000_tmp/reads/{sample}_{run}_R1.fq.gz',
-        r2 = 'output/000_tmp/reads/{sample}_{run}_R2.fq.gz'
+        r1 = temp('output/000_tmp/reads/{sample}_{run}_R1.fq.gz'),
+        r2 = temp('output/000_tmp/reads/{sample}_{run}_R2.fq.gz')
     singularity:
         samtools
     shell:
