@@ -44,7 +44,7 @@ rule target:
 
 rule genotype:
     input:
-        find_input_reads,        # just to make sure combine gets run first
+        unpack(find_input_reads), # just to make sure combine gets run first
         csv = sample_csv,
         ref = ref
     output:
