@@ -46,7 +46,7 @@ rule genotype:
     input:
         find_input_reads,        # just to make sure combine gets run first
         csv = sample_csv,
-        ref = honeybee_ref
+        ref = ref
     output:
         cutoffs = 'output/010_genotypes/040_stats/ldepth.mean_cutoffs.csv',
         vcf = 'output/010_genotypes/calls.vcf.gz',
