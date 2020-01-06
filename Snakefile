@@ -57,7 +57,7 @@ all_samples = sorted(set(sample_data.index))
 rule target:
     input:
         'output/010_genotypes/calls.vcf.gz',
-        'output/020_filtered-genotypes/filtered.vcf'
+        'output/020_filtered-genotypes/filtered.vcf.gz'
 
 
 rule filter:
@@ -139,4 +139,23 @@ rule combine_reads:
         'cat {input.r1_1} {input.r2_1} > {output.r1} & '
         'cat {input.r1_2} {input.r2_2} > {output.r2} & '
         'wait'
+
+
+# generic index rule
+rule index_vcf:
+    input:
+        'output/{folder}/{file}.vcf'
+    output:
+        gz = 'output/{folder}/{file}.vcf.gz',
+        tbi = 'output/{folder}/{file}.vcf.gz.tbi'
+    log:
+        'output/logs/{folder}/{file}_index-vcf.log'
+    wildcard_constraints:
+        file = 'filtered'
+    singularity:
+        samtools
+    shell:
+        'bgzip -c {input} > {output.gz} 2> {log} '
+        '; '
+        'tabix -p vcf {output.gz} 2>> {log}'
 
