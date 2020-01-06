@@ -75,7 +75,7 @@ rule filter:
     log:
         'output/logs/filter.log'
     singularity:
-        vcftools
+        honeybee_genotype_pipeline
     shell:
         'vcftools '
         '--gzvcf {input.vcf} '
