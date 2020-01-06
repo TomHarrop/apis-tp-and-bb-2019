@@ -11,6 +11,22 @@ def find_input_reads(wildcards):
     }
 
 
+def get_min_cutoff(wildcards):
+    cutoff_file = checkpoints.genotype.get(**wildcards).output['cutoffs']
+    cutoffs = pandas.read_csv(cutoff_file,
+                              header=None,
+                              index_col=0)
+    return cutoffs.loc['min_depth', 1]
+
+
+def get_max_cutoff(wildcards):
+    cutoff_file = checkpoints.genotype.get(**wildcards).output['cutoffs']
+    cutoffs = pandas.read_csv(cutoff_file,
+                              header=None,
+                              index_col=0)
+    return cutoffs.loc['max_depth', 1]
+
+
 ###########
 # GLOBALS #
 ###########
@@ -40,9 +56,43 @@ all_samples = sorted(set(sample_data.index))
 
 rule target:
     input:
-        'output/010_genotypes/calls.vcf.gz'
+        'output/010_genotypes/calls.vcf.gz',
+        'output/020_filtered-genotypes/filtered.vcf'
 
-rule genotype:
+
+rule filter:
+    input:
+        cutoffs = 'output/010_genotypes/040_stats/ldepth.mean_cutoffs.csv',
+        vcf = 'output/010_genotypes/calls.vcf.gz'
+    output:
+        'output/020_filtered-genotypes/filtered.vcf'
+    params:
+        min_depth = get_min_cutoff,
+        max_depth = get_max_cutoff,
+        maf = 0.1,
+        max_missing = 0.9,
+        qual = 30
+    log:
+        'output/logs/filter.log'
+    singularity:
+        vcftools
+    shell:
+        'vcftools '
+        '--gzvcf {input.vcf} '
+        '--maf {params.maf} '
+        '--max-missing {params.max_missing} '
+        '--minQ {params.qual} '
+        '--min-meanDP {params.min_depth} '
+        '--max-meanDP {params.max_depth} '
+        '--minDP {params.min_depth} '
+        '--maxDP {params.max_depth} '
+        '--recode '
+        '--stdout '
+        '> {output} '
+        '2> {log}'
+
+
+checkpoint genotype:
     input:
         unpack(find_input_reads), # just to make sure combine gets run first
         csv = sample_csv,
